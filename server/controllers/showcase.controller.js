@@ -80,7 +80,14 @@ const getAllShowcases = async (req, res) => {
 };
 
 const getShowcaseDetail = async (req, res) => {
+  const { id } = req.params;
+  const showcaseExists = await Showcase.findOne({ _id: id }).populate('creator');
 
+  if(showcaseExists) {
+    res.status(200).json(showcaseExists)
+  } else {
+    res.status(404).json({ message: "Showcase not found" })
+  }
 }
 
 // UPDATE
