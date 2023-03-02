@@ -99,7 +99,27 @@ const updateShowcase = async (req, res) => {
 // DELETE
 
 const deleteShowcase = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const showcaseToDelete = await Showcase.findById({_id: id }).populate('creator')
 
+    if(!showcaseToDelete) throw new Error('BS not Found');
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    showcaseToDelete.remove({ session });
+    showcaseToDelete.creator.allShowcases.pull
+    (showcaseToDelete);
+
+    await showcaseToDelete.creator.save({ session });
+    await session.commitTransaction();
+
+    res.status(200).json({ message: "BS deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Delete Failed" })
+  }
 };
 
 export {
