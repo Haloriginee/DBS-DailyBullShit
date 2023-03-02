@@ -93,7 +93,26 @@ const getShowcaseDetail = async (req, res) => {
 // UPDATE
 
 const updateShowcase = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, showcaseType, location, day, photo, email } = req.body;
 
+    const photoUrl = await cloudinary.uploader.upload(photo);
+
+    await Showcase.findByIdAndUpdate({ _id: id }, {
+      title,
+      description,
+      showcaseType,
+      location,
+      day,
+      photo: photoUrl.url || photo
+    })
+
+    res.status(200).json({ message: "BS updated successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Update Failed" })
+  }
 };
 
 // DELETE
